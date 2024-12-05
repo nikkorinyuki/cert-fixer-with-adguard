@@ -18,12 +18,10 @@ Users have reported as working on `Redme API 33 (Android 13)`.
    Cert-Fixer will copy all your user certificates to system store at boot up.
 6. Your user certificates should now be available in the system store!
 
-## Caution
-Having more than one certificate in the user store is reported to cause boot loops in some cases. Make sure that you have only one certificate, until this is fixed.
-
 ## Notes
 1. Cert-Fixer copies all the CA certificates from the user store to the system store. Make sure you do not have any untrusted certificates in the user store before reboot.
 2. If there are multiple versions of the same certificate (same hash, but different extensions), only the latest certificate will be copied.
+3. You can install multiple certificates simultaneously.
 
 
 # Description and Credits
