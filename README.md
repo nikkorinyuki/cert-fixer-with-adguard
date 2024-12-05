@@ -12,11 +12,14 @@ Users have reported as working on `Redme API 33 (Android 13)`.
 
 1. Root your Android device using [rootAVD](https://gitlab.com/newbit/rootAVD) (rootAVD uses [Magisk](https://github.com/topjohnwu/Magisk)).
 2. Complete any pending updates for Magisk, and make sure you have the latest Magisk version.
-3. Install your custom CA certificate under user certificate store.
+3. Install your custom CA certificate under user certificate store.  
 4. Download `Cert-Fixer.zip` and install Cert-Fixer module in Magisk.
 5. Reboot.  
    Cert-Fixer will copy all your user certificates to system store at boot up.
 6. Your user certificates should now be available in the system store!
+
+## Caution
+Having more than one certificate in the user store is reported to cause boot loops in some cases. Make sure that you have only one certificate, until this is fixed.
 
 ## Notes
 1. Cert-Fixer copies all the CA certificates from the user store to the system store. Make sure you do not have any untrusted certificates in the user store before reboot.
