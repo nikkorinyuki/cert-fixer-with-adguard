@@ -32,6 +32,21 @@ ls /data/misc/user/*/cacerts-added/* | grep -o -E '[0-9a-fA-F]{8}.[0-9]+$' | cut
 
 echo "[i] found $(cat /data/local/tmp/cert-fixer.certs-found | wc -l) certificates"
 
+# Android 14 support
+echo "[i] checking for cert location in APEX container"
+if [ -d /apex/com.android.conscrypt/cacerts ]; then
+    # Clone directory into tmpfs
+    echo "[i] cert location exists in APEX"
+    echo "[i] copying cert to APEX container"
+    echo "[i] clone directory into tmpfs"
+    rm -f /data/local/tmp/adg-ca-copy
+    mkdir -p /data/local/tmp/adg-ca-copy
+    mount -t tmpfs tmpfs /data/local/tmp/adg-ca-copy
+    cp -f /apex/com.android.conscrypt/cacerts/* /data/local/tmp/adg-ca-copy/
+else
+    echo "[i] APEX container not found, this must be Android < 14"
+fi
+
 echo "[i] entering loop for copying certificates to system store"
 while read USER_CERT_HASH; do
 
@@ -56,38 +71,35 @@ while read USER_CERT_HASH; do
     set_context /system/etc/security/cacerts ${MODDIR}/system/etc/security/cacerts
 
     # Android 14 support
-    # Since Magisk ignore /apex for module file injections, use non-Magisk way
     echo "[i] checking for cert location in APEX container"
     if [ -d /apex/com.android.conscrypt/cacerts ]; then
-        # Clone directory into tmpfs
-        echo "[i] cert location exists in APEX"
-        echo "[i] copying cert to APEX container"
-        echo "[i] clone directory into tmpfs"
-        rm -f /data/local/tmp/adg-ca-copy
-        mkdir -p /data/local/tmp/adg-ca-copy
-        mount -t tmpfs tmpfs /data/local/tmp/adg-ca-copy
-        cp -f /apex/com.android.conscrypt/cacerts/* /data/local/tmp/adg-ca-copy/
-
-        # Do the same as in Magisk module
         echo "[i] copy the cert and set the ownership and permissions"
         cp -f ${USER_CERT_FILE} /data/local/tmp/adg-ca-copy/${USER_CERT_HASH}.0
-        chown -R 0:0 /data/local/tmp/adg-ca-copy
-        set_context /apex/com.android.conscrypt/cacerts /data/local/tmp/adg-ca-copy
-
-        # Mount directory inside APEX, and remove temporary one.
-        echo "[i] mount the directory inside APEX and remove the temp one"
-        mount --bind /data/local/tmp/adg-ca-copy /apex/com.android.conscrypt/cacerts
-        for pid in 1 $(pgrep zygote) $(pgrep zygote64); do
-            nsenter --mount=/proc/${pid}/ns/mnt -- \
-                /bin/mount --bind /data/local/tmp/adg-ca-copy /apex/com.android.conscrypt/cacerts
-        done
-
-        umount /data/local/tmp/adg-ca-copy
-        rmdir /data/local/tmp/adg-ca-copy
     else
         echo "[i] APEX container not found, this must be Android < 14"
     fi
 
 done </data/local/tmp/cert-fixer.certs-found
+
+# Android 14 support
+echo "[i] checking for cert location in APEX container"
+if [ -d /apex/com.android.conscrypt/cacerts ]; then
+    chown -R 0:0 /data/local/tmp/adg-ca-copy
+    set_context /apex/com.android.conscrypt/cacerts /data/local/tmp/adg-ca-copy
+
+    # Mount directory inside APEX, and remove temporary one.
+    echo "[i] mount the directory inside APEX and remove the temp one"
+    mount --bind /data/local/tmp/adg-ca-copy /apex/com.android.conscrypt/cacerts
+    for pid in 1 $(pgrep zygote) $(pgrep zygote64); do
+        nsenter --mount=/proc/${pid}/ns/mnt -- \
+            /bin/mount --bind /data/local/tmp/adg-ca-copy /apex/com.android.conscrypt/cacerts
+    done
+
+    umount /data/local/tmp/adg-ca-copy
+    rmdir /data/local/tmp/adg-ca-copy
+else
+    echo "[i] APEX container not found, this must be Android < 14"
+fi
+
 
 echo "[i] Cert-Fixer execution completed"
