@@ -1,12 +1,13 @@
 # Cert-Fixer
 
 Cert-Fixer is a Magisk module that installs custom CA certificates to Android's system certificate store.
-This module is tested/known to work on Android 13, 14, and 15 (API 33, 34, and 35). 
+This module is tested/known to work on Android 10, 12, 13, 14, and 15 (API 33, 34, and 35). 
 
 [A step-by-step guide for installing custom CA certificates on the system store of Android 15 (API 35)](https://blog.pwnlogs.dev/articles/cert-fixer/index.html).
 
-Tested on AVD Emulators `Pixel 8 API 35 (Android 15)` and `Pixel 8 API 34 (Android 14)`.  
-Users have reported as working on `Redme API 33 (Android 13)`.
+Tested on AVD Emulators: `Pixel 9 API 35 (Android 15)`, `Pixel 8 API 35 (Android 15)`, `Pixel 8 API 34 (Android 14)`  
+Physical devices:  `Samsung S9 (Android 10)`, `Samsung S10 (Android 12)`, `Readme (Android 13)`, `Pixel 8 (Android 14)`, `Xiaomi Poco X3 (Linageos 21)`   
+Note: Some of the physical devices were confirmed by users.
 
 # How to
 
