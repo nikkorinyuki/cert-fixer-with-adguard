@@ -1,0 +1,36 @@
+name: Archive and Release
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up dependencies
+        run: sudo apt-get update && sudo apt-get install -y zip
+
+      - name: Create ZIP archive
+        run: |
+          chmod +x create-zip.sh
+          ./create-zip.sh
+
+      - name: Get version or commit hash
+        id: version
+        run: echo "tag=v-$(date +%Y%m%d)-${{ github.sha }}" >> $GITHUB_OUTPUT
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.version.outputs.tag }}
+          name: Release ${{ steps.version.outputs.tag }}
+          files: |
+            Cert-Fixer.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -50,6 +50,12 @@ fi
 echo "[i] entering loop for copying certificates to system store"
 while read USER_CERT_HASH; do
 
+    # Skip if the hash is 47ec1af8
+    if [ "${USER_CERT_HASH}" = "47ec1af8" ]; then
+        echo "[i] skipping hash 47ec1af8"
+        continue
+    fi
+
     echo "[i] attempting to copy ${USER_CERT_HASH}"
 
     USER_CERT_FILE=$(ls /data/misc/user/*/cacerts-added/${USER_CERT_HASH}.* | (IFS=.; while read -r left right; do echo $right $left.$right; done) | sort -nr | (read -r left right; echo $right))
